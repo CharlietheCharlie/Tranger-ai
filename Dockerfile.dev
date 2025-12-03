@@ -1,0 +1,11 @@
+FROM node:20
+WORKDIR /app
+
+# 先裝 deps
+COPY package.json package-lock.json prisma ./
+RUN npm install
+
+# bind mount 會把 src 蓋掉，所以不 COPY src
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

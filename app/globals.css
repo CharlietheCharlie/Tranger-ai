@@ -1,0 +1,36 @@
+
+@import "tailwindcss";
+
+:root {
+  --font-sans: 'Inter', sans-serif;
+  
+  /* Clean Modern Palette */
+  --bg-paper: #F8FAFC;    
+  --bg-card: #FFFFFF;     
+  --text-primary: #0F172A; 
+  --text-secondary: #64748B; 
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-paper);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide scrollbar for clean horizontal scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom Utilities */
+.vintage-shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+

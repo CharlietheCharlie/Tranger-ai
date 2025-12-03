@@ -1,0 +1,93 @@
+{
+  "TripGeneratorModal": {
+    "newTrip": "新しい旅行",
+    "createManual": "空のプランを作成",
+    "enterDetails": "詳細を入力して開始",
+    "destination": "目的地",
+    "whereGoing": "どこに行きますか？",
+    "startDate": "開始日",
+    "duration": "期間",
+    "useAI": "AI アシスタント",
+    "aiDesc": "アクティビティとスケジュールを自動提案",
+    "generate": "プランを作成",
+    "days": "{count, plural, =0 {0 日} one {1 日} other {# 日}}"
+  },
+  "AnimatedLoadingText": {
+    "PlanningYourTrip": "旅行を計画中",
+    "FindingTheBestSpots": "最高のスポットを探しています",
+    "OptimizingRouteDetails": "ルートの詳細を最適化しています",
+    "AlmostReady": "もうすぐ完了します"
+  },
+  "CommentsSidebar": {
+    "chat": "チャット",
+    "startConversation": "会話を始めましょう。",
+    "typeMessage": "メッセージを入力...",
+    "send": "送信"
+  },
+  "ItineraryCard": {
+    "days" : "{count, plural, =0 {0 日} one {1 日} other {# 日}}"
+  },
+  "EditItineraryModal": {
+    "confirmDelete": "Are you sure you want to delete this itinerary?",
+    "tripSettings": "旅行設定",
+    "tripName": "旅行名",
+    "destination": "目的地",
+    "startDate": "開始日",
+    "selectDate": "",
+    "coverImage": "カバー画像",
+    "change": "変更",
+    "remove": "削除",
+    "uploadImage": "画像をアップロード",
+    "deleteTrip": "旅行を削除",
+    "cancel": "キャンセル",
+    "saveChanges": "変更を保存"
+  },
+  "InviteModal": {
+    "inviteCollab": "共同編集者を招待",
+    "emailPlaceholder": "friend@example.com",
+    "send": "送信",
+    "orLink": "またはリンクを共有",
+    "tripLink": "旅行リンク",
+    "copied": "コピー完了",
+    "copy": "コピー"
+  },
+  "EditActivityModal": {
+    "editActivity": "アクティビティ編集",
+    "addActivity": "アクティビティを追加",
+    "title": "タイトル",
+    "time": "時間",
+    "duration": "期間",
+    "timeConflict": "他のアクティビティと時間が重複しています。",
+    "location": "場所",
+    "notes": "メモ",
+    "cost": "費用",
+    "tags": "タグ",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "add": "追加"
+  },
+  "Dashboard": {
+    "myTrips": "マイ・トリップ",
+    "manageAdventures": "次の冒険を計画しましょう。",
+    "searchPlaceholder": "旅行を検索...",
+    "newTrip": "新しい旅行",
+    "createEmptyTrip": "新規作成"
+  },
+  "DayColumn": {
+    "unscheduled": "未定",
+    "addEntry": "追加"
+  },
+  "CityAutocomplete": {
+    "addCity": "都市を追加..."
+  },
+  "App": {
+    "appTitle": "Wanderplan AI",
+    "days": "{count, plural, =0 {0 days} one {1 day} other {# days}}",
+    "invite": "招待",
+    "signOut": "サインアウト",
+    "signInRequired": "サインインが必要です",
+    "signInRequiredDesc": "旅行を同期して共同作業するにはサインインしてください。",
+    "signInWithGoogle": "Google でサインイン",
+    "terms": "サインインすることで、利用規約に同意したことになります。"
+  }
+}
