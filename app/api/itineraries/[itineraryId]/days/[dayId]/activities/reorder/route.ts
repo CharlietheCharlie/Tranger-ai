@@ -5,7 +5,7 @@ import { auth } from '@/auth';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { dayId: string } }
+  { params }: { params: Promise<{ dayId: string }> }
 ) {
   try {
     const session = await auth();
@@ -14,7 +14,7 @@ export async function PATCH(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { dayId } = params;
+    const { dayId } = await params;
     const { activityIds } = await request.json();
 
     if (!Array.isArray(activityIds)) {
