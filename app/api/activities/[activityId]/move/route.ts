@@ -5,7 +5,7 @@ import { auth } from '@/auth';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { activityId: string } }
+  { params }: { params: Promise<{ activityId: string }> }
 ) {
   try {
     const session = await auth();
@@ -14,7 +14,7 @@ export async function POST(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
     
-    const { activityId } = params;
+    const { activityId } = await params;
     const { targetDayId, position } = await request.json();
 
     const activity = await prisma.activity.findUnique({
