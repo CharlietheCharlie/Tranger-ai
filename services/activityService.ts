@@ -78,13 +78,14 @@ interface MoveActivityData {
   itineraryId: string;
   activityId: string;
   targetDayId: string;
+  position: number;
 }
 
-async function moveActivity({ activityId, targetDayId }: MoveActivityData) {
-  const response = await fetch(`/api/activities/${activityId}`, {
-    method: 'PATCH',
+async function moveActivity({ activityId, targetDayId, position }: MoveActivityData) {
+  const response = await fetch(`/api/activities/${activityId}/move`, {
+    method: 'POST',
     headers: getHeaders(),
-    body: JSON.stringify({ dayId: targetDayId }),
+    body: JSON.stringify({ targetDayId, position }),
   });
 
   if (!response.ok) {
@@ -95,7 +96,7 @@ async function moveActivity({ activityId, targetDayId }: MoveActivityData) {
 
 export function useMoveActivity() {
   const queryClient = useQueryClient();
-  return useMutation<Activity, Error, MoveActivityData>({
+  return useMutation<void, Error, MoveActivityData>({
     mutationFn: moveActivity,
     onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ 
@@ -148,6 +149,36 @@ export function useReorderDays() {
   const queryClient = useQueryClient();
   return useMutation<void, Error, ReorderDaysData>({
     mutationFn: reorderDays,
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ 
+        queryKey: ["itinerary", vars.itineraryId] 
+      });
+    }
+  });
+}
+
+interface ReorderActivitiesData {
+  itineraryId: string;
+  dayId: string;
+  orderedActivityIds: string[];
+}
+
+async function reorderActivities({ itineraryId, dayId, orderedActivityIds }: ReorderActivitiesData) {
+  const response = await fetch(`/api/itineraries/${itineraryId}/days/${dayId}/activities/reorder`, {
+    method: 'PATCH',
+    headers: getHeaders(),
+    body: JSON.stringify({ activityIds: orderedActivityIds }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to reorder activities');
+  }
+}
+
+export function useReorderActivities() {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, ReorderActivitiesData>({
+    mutationFn: reorderActivities,
     onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ 
         queryKey: ["itinerary", vars.itineraryId] 

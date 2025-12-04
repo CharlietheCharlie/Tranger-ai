@@ -6,7 +6,6 @@ import {
   DragOverlay,
   closestCorners,
   KeyboardSensor,
-  PointerSensor,
   useSensor,
   useSensors,
   DragStartEvent,
@@ -14,15 +13,19 @@ import {
   DragEndEvent,
   defaultDropAnimationSideEffects,
   DropAnimation,
+  MouseSensor,
+  TouchSensor,
 } from '@dnd-kit/core';
-import { sortableKeyboardCoordinates, SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { arrayMove, sortableKeyboardCoordinates, SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { Itinerary, Activity, Day } from '../types';
 import { DayColumn } from './DayColumn';
 import { ActivityCard } from './ActivityCard';
-import { useReorderDays, useMoveActivity } from '../services/activityService'; // Import react-query hooks
+import { useReorderDays, useMoveActivity, useReorderActivities } from '../services/activityService';
+import { Loader2 } from 'lucide-react';
 
 interface ItineraryBoardProps {
   itinerary: Itinerary;
+  isFetching: boolean;
   onActivityClick?: (activity: Activity | null, dayId: string) => void;
 }
 
@@ -36,24 +39,33 @@ const dropAnimationConfig: DropAnimation = {
   }),
 };
 
-export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, onActivityClick }) => {
+export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, isFetching, onActivityClick }) => {
   const reorderDaysMutation = useReorderDays();
   const moveActivityMutation = useMoveActivity();
+  const reorderActivitiesMutation = useReorderActivities();
   
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<'ACTIVITY' | 'DAY' | null>(null);
   const [activeItem, setActiveItem] = useState<Activity | Day | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-        activationConstraint: {
-            distance: 5,
-        }
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const isUpdating = isFetching || reorderDaysMutation.isPending || moveActivityMutation.isPending || reorderActivitiesMutation.isPending;
 
   const handleAddActivity = (dayId: string) => {
     onActivityClick?.(null, dayId);
@@ -91,51 +103,51 @@ export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, onAct
         return;
     }
 
-    if (activeType === 'DAY') {
-        if (active.id !== over.id) {
-            const oldIndex = itinerary.days.findIndex(d => d.id === active.id);
-            const newIndex = itinerary.days.findIndex(d => d.id === over.id);
-            
-            const newOrder = [...itinerary.days];
-            const [movedDay] = newOrder.splice(oldIndex, 1);
-            newOrder.splice(newIndex, 0, movedDay);
-            const orderedDayIds = newOrder.map(day => day.id);
+    if (active.id === over.id) {
+        resetState();
+        return;
+    }
 
-            try {
-                await reorderDaysMutation.mutateAsync({ itineraryId: itinerary.id, orderedDayIds });
-            } catch (error) {
-                console.error('Failed to reorder days:', error);
-            }
+    if (activeType === 'DAY') {
+        const oldIndex = itinerary.days.findIndex(d => d.id === active.id);
+        const newIndex = itinerary.days.findIndex(d => d.id === over.id);
+        
+        if (oldIndex !== newIndex) {
+            const orderedDayIds = arrayMove(itinerary.days, oldIndex, newIndex).map(d => d.id);
+            await reorderDaysMutation.mutateAsync({ itineraryId: itinerary.id, orderedDayIds });
         }
     }
 
     if (activeType === 'ACTIVITY') {
-        const activeIdStr = active.id as string;
-        const overIdStr = over.id as string;
-        
-        const sourceDay = itinerary.days.find(d => d.activities.some(a => a.id === activeIdStr));
-        let targetDay = itinerary.days.find(d => d.id === overIdStr) || 
-                        itinerary.days.find(d => d.activities.some(a => a.id === overIdStr));
+        const sourceDay = itinerary.days.find(d => d.activities.some(a => a.id === active.id));
+        const overDay = itinerary.days.find(d => d.id === over.id || d.activities.some(a => a.id === over.id));
 
-        if (sourceDay && targetDay) {
-            const activeActivityIndex = sourceDay.activities.findIndex(a => a.id === activeIdStr);
-            let overIndex = targetDay.activities.findIndex(a => a.id === overIdStr);
+        if (sourceDay && overDay) {
+            const sourceActivityIndex = sourceDay.activities.findIndex(a => a.id === active.id);
+            const sourceActivity = sourceDay.activities[sourceActivityIndex];
             
+            let overActivityIndex = overDay.activities.findIndex(a => a.id === over.id);
             if (over.data.current?.type === 'DAY') {
-                overIndex = targetDay.activities.length;
+                overActivityIndex = overDay.activities.length;
             }
 
-            if (sourceDay.id !== targetDay.id || activeActivityIndex !== overIndex) {
-                if (overIndex === -1) overIndex = targetDay.activities.length;
-                try {
-                    await moveActivityMutation.mutateAsync({ 
-                        itineraryId: itinerary.id,
-                        activityId: activeIdStr, 
-                        targetDayId: targetDay.id 
-                    });
-                } catch (error) {
-                    console.error('Failed to move activity:', error);
-                }
+            if (sourceDay.id === overDay.id) {
+                // Reordering within the same day
+                const reorderedActivities = arrayMove(sourceDay.activities, sourceActivityIndex, overActivityIndex);
+                const orderedActivityIds = reorderedActivities.map(a => a.id);
+                await reorderActivitiesMutation.mutateAsync({
+                    itineraryId: itinerary.id,
+                    dayId: sourceDay.id,
+                    orderedActivityIds
+                });
+            } else {
+                // Moving to a different day
+                await moveActivityMutation.mutateAsync({
+                    itineraryId: itinerary.id,
+                    activityId: sourceActivity.id,
+                    targetDayId: overDay.id,
+                    position: overActivityIndex,
+                });
             }
         }
     }
@@ -150,43 +162,50 @@ export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, onAct
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex h-full gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto bg-white/50 no-scrollbar snap-x snap-mandatory">
-        <SortableContext items={itinerary.days.map(d => d.id)} strategy={horizontalListSortingStrategy}>
-            {itinerary.days.map((day) => (
-            <DayColumn 
-                key={day.id} 
-                day={day} 
-                itineraryId={itinerary.id} 
-                onActivityClick={onActivityClick} 
-                onAddActivity={handleAddActivity}
-            />
-            ))}
-        </SortableContext>
-        
-        {/* Spacer for easier scrolling to the end on mobile */}
-        <div className="w-4 shrink-0 md:hidden" />
-      </div>
+    <div className="relative h-full">
+      {isUpdating && (
+        <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <Loader2 size={48} className="text-slate-900 animate-spin" />
+        </div>
+      )}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="flex h-full gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto bg-white/50 no-scrollbar snap-x snap-mandatory">
+          <SortableContext items={itinerary.days.map(d => d.id)} strategy={horizontalListSortingStrategy}>
+              {itinerary.days.map((day) => (
+              <DayColumn 
+                  key={day.id} 
+                  day={day} 
+                  itineraryId={itinerary.id} 
+                  onActivityClick={onActivityClick} 
+                  onAddActivity={handleAddActivity}
+              />
+              ))}
+          </SortableContext>
+          
+          {/* Spacer for easier scrolling to the end on mobile */}
+          <div className="w-4 shrink-0 md:hidden" />
+        </div>
 
-      <DragOverlay dropAnimation={dropAnimationConfig}>
-        {activeType === 'ACTIVITY' && activeItem ? (
-           <div className="opacity-90 rotate-2 scale-105 cursor-grabbing w-[300px]">
-              <ActivityCard activity={activeItem as Activity} dayId="overlay" />
-           </div>
-        ) : null}
-        {activeType === 'DAY' && activeItem ? (
-             <div className="opacity-90 rotate-2 scale-105 cursor-grabbing h-[600px]">
-                 <DayColumn day={activeItem as Day} itineraryId={itinerary.id} />
-             </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+        <DragOverlay dropAnimation={dropAnimationConfig}>
+          {activeType === 'ACTIVITY' && activeItem ? (
+            <div className="opacity-90 rotate-2 scale-105 cursor-grabbing w-[300px]">
+                <ActivityCard activity={activeItem as Activity} dayId="overlay" />
+            </div>
+          ) : null}
+          {activeType === 'DAY' && activeItem ? (
+              <div className="opacity-90 rotate-2 scale-105 cursor-grabbing h-[600px]">
+                  <DayColumn day={activeItem as Day} itineraryId={itinerary.id} />
+              </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+    </div>
   );
 };
 

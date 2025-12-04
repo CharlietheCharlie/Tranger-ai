@@ -1,12 +1,5 @@
-import React, { useState} from "react";
-import {
-  X,
-  Sparkles,
-  Loader2,
-  Plus,
-  Check,
-  Calendar,
-} from "lucide-react";
+import React, { useState } from "react";
+import { X, Sparkles, Loader2, Plus, Check, Calendar } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import {
   useCreateItinerary,
@@ -62,7 +55,6 @@ export const TripGeneratorModal: React.FC<TripGeneratorModalProps> = ({
       : setError("");
     setSelectedDestinations(selectedDestinations.filter((c) => c !== city));
   };
-
 
   const handleGenerate = async () => {
     if (selectedDestinations.length === 0) {
@@ -162,9 +154,7 @@ export const TripGeneratorModal: React.FC<TripGeneratorModalProps> = ({
             <h2 className="text-2xl font-bold text-slate-900">
               {useAI ? t("newTrip") : t("createManual")}
             </h2>
-            <p className="text-sm text-slate-500 mt-1">
-              {t("enterDetails")}
-            </p>
+            <p className="text-sm text-slate-500 mt-1">{t("enterDetails")}</p>
           </div>
           <button
             onClick={onClose}
@@ -308,7 +298,11 @@ export const TripGeneratorModal: React.FC<TripGeneratorModalProps> = ({
             }`}
           >
             {isGenerating ? (
-               <AnimatedLoadingText isGenerating={isGenerating} />
+              useAI ? (
+                <AnimatedLoadingText isGenerating={isGenerating} />
+              ) : (
+                <Loader2 size={18} className="animate-spin" />
+              )
             ) : (
               <>
                 {useAI ? <Sparkles size={18} /> : <Plus size={18} />}

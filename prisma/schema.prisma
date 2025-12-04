@@ -106,9 +106,11 @@ model Activity {
   tags        String[]
   notes       String?
   dayId       String
+  position    Int       @default(0)
   day         Day       @relation(fields: [dayId], references: [id], onDelete: Cascade)
   comments    Comment[]
 
+  @@index([dayId, position])
   @@index([dayId])
 }
 

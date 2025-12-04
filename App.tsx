@@ -35,6 +35,7 @@ const App = () => {
   const {
     data: currentItinerary,
     isLoading: isLoadingItinerary,
+    isFetching: isFetchingItinerary,
     isError: isErrorItinerary,
   } = useItinerary(currentItineraryId);
 
@@ -121,6 +122,7 @@ const App = () => {
                 {currentItinerary && (
                   <ItineraryBoard
                     itinerary={currentItinerary}
+                    isFetching={isFetchingItinerary}
                     onActivityClick={(activity, dayId) =>
                       setEditingActivity({ activity, dayId })
                     }
