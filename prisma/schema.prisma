@@ -18,6 +18,7 @@ model User {
   comments                Comment[]      @relation("CommentAuthor")
   createdItineraries      Itinerary[]    @relation("ItineraryCreator")
   sessions                Session[]
+  InviteToken             InviteToken[]
 }
 
 model Account {
@@ -77,6 +78,7 @@ model Itinerary {
   comments      Comment[]
   days          Day[]
   creator       User?          @relation("ItineraryCreator", fields: [creatorId], references: [id])
+  InviteToken   InviteToken[]
 
   @@index([creatorId])
   @@index([startDate])
@@ -149,4 +151,17 @@ model CityAlternateName {
 
   @@index([geonameId])
   @@index([lang])
+}
+
+model InviteToken {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  itineraryId String
+  email       String?
+  inviterId   String?
+  createdAt   DateTime @default(now())
+  used        Boolean  @default(false)
+
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id])
+  inviter     User?     @relation(fields: [inviterId], references: [id])
 }

@@ -33,21 +33,13 @@ export async function POST(request: Request) {
       where: { creatorId: realUserId },
     });
 
-    for (const itin of itinerariesToJoin) {
-      await prisma.collaborator.upsert({
-        where: {
-          userId_itineraryId: {
-            userId: realUserId,
-            itineraryId: itin.id,
-          },
-        },
-        update: {},
-        create: {
-          userId: realUserId,
-          itineraryId: itin.id,
-        },
-      });
-    }
+    await prisma.collaborator.createMany({
+      data: itinerariesToJoin.map((itin) => ({
+        userId: realUserId,
+        itineraryId: itin.id,
+      })),
+      skipDuplicates: true,
+    });
 
     // Update Comments
     await prisma.comment.updateMany({

@@ -34,32 +34,19 @@ export function useAddComment() {
   });
 }
 
-interface AddCollaboratorData {
-  itineraryId: string;
-  email: string;
-}
-
-async function addCollaborator({ itineraryId, email }: AddCollaboratorData) {
-  const response = await fetch(`/api/itineraries/${itineraryId}/collaborators`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email }),
+async function createInvite(itineraryId: string) {
+  const res = await fetch("/api/invite", {
+    method: "POST",
+    body: JSON.stringify({ itineraryId }),
   });
 
-  if (!response.ok) {
-    throw new Error('Failed to add collaborator');
-  }
-  return response.json();
+  if (!res.ok) throw new Error("Failed to create invite");
+
+  return res.json(); 
 }
 
-export function useAddCollaborator() {
-  const queryClient = useQueryClient();
-  return useMutation<User[], Error, AddCollaboratorData>({ // Collaborators are array of Users
-    mutationFn: addCollaborator,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['itineraries'] }); // Invalidate itineraries to refetch collaborators
-    },
+export function useCreateInvite() {
+  return useMutation({
+    mutationFn: createInvite,
   });
 }

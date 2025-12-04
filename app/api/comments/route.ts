@@ -5,9 +5,12 @@ import { auth } from "@/auth";
 export async function POST(request: Request) {
   try {
     const session = await auth();
-
-    if (!session || !session.user || !session.user.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const tempCreatorId = request.headers.get("x-temp-user-id");
+    if (!session?.user?.id && !tempCreatorId) {
+      return NextResponse.json(
+        { message: "Unauthorized: User not authenticated" },
+        { status: 401 }
+      );
     }
 
     const { itineraryId, text, activityId, imageUrl } = await request.json();
@@ -15,7 +18,8 @@ export async function POST(request: Request) {
     const newComment = await prisma.comment.create({
       data: {
         text,
-        authorId: session.user.id,
+        authorId: session?.user?.id || null,
+        tempAuthorId: tempCreatorId || null,
         activityId,
         itineraryId,
         imageUrl,
