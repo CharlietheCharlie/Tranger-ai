@@ -163,10 +163,37 @@ async function reorderItineraries(orderedItineraryIds: string[]) {
 
 export function useReorderItineraries() {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, string[]>({
-    mutationFn: reorderItineraries,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["itineraries"] });
+
+  return useMutation({
+    mutationFn: async ({ newOrder }: { newOrder: Itinerary[] }) => {
+      const ids = newOrder.map((it) => it.id);
+      return reorderItineraries(ids);
+    },
+    // Optimistic update
+    onMutate: async ({ newOrder }) => {
+      await queryClient.cancelQueries({ queryKey: ["itineraries"] });
+
+      const previous =
+        queryClient.getQueryData<Itinerary[]>(["itineraries"]);
+
+      // Replace only the order, but preserve other fields
+      const merged = newOrder.map((it) => ({
+        ...(previous?.find((p) => p.id === it.id) ?? it),
+        id: it.id, // ensure correct id
+      }));
+
+      queryClient.setQueryData(["itineraries"], merged);
+
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) {
+        queryClient.setQueryData(["itineraries"], ctx.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["itineraries"] });
     },
   });
 }
+

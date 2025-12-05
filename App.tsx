@@ -12,7 +12,6 @@ import { Dashboard } from "./components/Dashboard";
 import { Activity } from "./types";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
-import { useSession } from "next-auth/react";
 import { useItinerary } from "./services/itineraryService";
 import ItinerarySkeleton from "./components/ItinerarySkeleton";
 import { useRouter } from "next/navigation";
@@ -57,6 +56,7 @@ const App = () => {
         return "EN";
     }
   };
+
 
   // Profile dropdown
   const [isProfileOpen, setIsProfileOpen] = useState(false);

@@ -14,6 +14,7 @@ import {
   useDeleteItinerary,
 } from "../services/itineraryService";
 import { deleteFile, uploadFile } from "@/services/s3Service";
+import { useStore } from "@/services/store";
 
 interface EditItineraryModalProps {
   isOpen: boolean;
@@ -27,7 +28,7 @@ export const EditItineraryModal: React.FC<EditItineraryModalProps> = ({
   itinerary,
 }) => {
   const t = useTranslations("EditItineraryModal");
-
+  const { selectItinerary } = useStore();
   const updateItineraryMutation = useUpdateItinerary();
   const deleteItineraryMutation = useDeleteItinerary();
 
@@ -91,12 +92,15 @@ export const EditItineraryModal: React.FC<EditItineraryModalProps> = ({
    * 刪整個 itinerary（順便刪 S3）
    */
   const handleDelete = async () => {
-    if (!window.confirm(t("confirmDelete"))) return;
-
+    // confirm
+    const confirmDelete = window.confirm(t("confirmDelete"));
+    if (!confirmDelete) return;
     try {
       if (initialCoverImage) await deleteFile(initialCoverImage);
       await deleteItineraryMutation.mutateAsync(itinerary.id);
+
       onClose();
+      selectItinerary("");
     } catch (error) {
       console.error("Failed to delete itinerary:", error);
     }
@@ -105,9 +109,7 @@ export const EditItineraryModal: React.FC<EditItineraryModalProps> = ({
   /**
    * 上傳新的封面圖（先上傳，但不刪舊圖）
    */
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 

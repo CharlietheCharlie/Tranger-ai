@@ -26,6 +26,20 @@ export async function POST(request: Request) {
       },
     });
 
+    // ========== call socket ==========
+    const socketUrl = process.env.SOCKET_SERVER_URL;
+    if (socketUrl) {
+      fetch(`${socketUrl}/broadcast`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "new-message",
+          itineraryId,
+          payload: newComment,
+        }),
+      }).catch((err) => console.error("Socket broadcast error:", err));
+    }
+
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {
     console.error("Error adding comment:", error);

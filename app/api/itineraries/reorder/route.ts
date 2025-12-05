@@ -6,11 +6,11 @@ import { auth } from '@/auth';
 export async function PATCH(request: Request) {
   try {
     const session = await auth();
+    const tempCreatorId = request.headers.get('x-temp-user-id');
 
-    if (!session || !session.user || !session.user.id) {
+    if (!session?.user?.id && !tempCreatorId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-
     const { orderedItineraryIds } = await request.json(); // Expects an array of itinerary IDs in the new order
 
     const transaction = orderedItineraryIds.map((itineraryId: string, index: number) =>

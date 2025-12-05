@@ -44,7 +44,7 @@ export async function GET(request: Request) {
         comments: true,
       },
       orderBy: {
-        id: "asc", // Or some other meaningful order
+        position: "asc",
       },
     });
     return NextResponse.json(itineraries);

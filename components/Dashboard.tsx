@@ -59,8 +59,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectItinerary, onNewTr
       const [movedItem] = newOrder.splice(oldIndex, 1);
       newOrder.splice(newIndex, 0, movedItem);
 
-      const orderedItineraryIds = newOrder.map(it => it.id);
-      await reorderItinerariesMutation.mutateAsync(orderedItineraryIds);
+      await reorderItinerariesMutation.mutateAsync({ newOrder });
     }
     setActiveId(null);
   };

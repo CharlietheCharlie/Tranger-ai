@@ -164,6 +164,6 @@ model InviteToken {
   createdAt   DateTime @default(now())
   used        Boolean  @default(false)
 
-  itinerary   Itinerary @relation(fields: [itineraryId], references: [id])
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
   inviter     User?     @relation(fields: [inviterId], references: [id])
 }
