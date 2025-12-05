@@ -1,5 +1,5 @@
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Comment, User } from '../types';
 
 interface AddCommentData {
@@ -7,6 +7,10 @@ interface AddCommentData {
   text: string;
   activityId?: string;
   imageUrl?: string;
+}
+
+interface ItineraryComment extends Comment {
+  author: User; // Assuming author is always included
 }
 
 async function addComment(commentData: AddCommentData) {
@@ -29,8 +33,25 @@ export function useAddComment() {
   return useMutation<Comment, Error, AddCommentData>({
     mutationFn: addComment,
     onSuccess: (_data, vars) => {
-      queryClient.invalidateQueries({ queryKey: ['itinerary', vars.itineraryId] });
+      // Invalidate the specific comments query for the itinerary
+      queryClient.invalidateQueries({ queryKey: ['comments', vars.itineraryId] });
     },
+  });
+}
+
+async function getItineraryComments(itineraryId: string): Promise<ItineraryComment[]> {
+  const response = await fetch(`/api/itineraries/${itineraryId}/comments`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch itinerary comments');
+  }
+  return response.json();
+}
+
+export function useItineraryComments(itineraryId: string) {
+  return useQuery<ItineraryComment[], Error>({
+    queryKey: ['comments', itineraryId],
+    queryFn: () => getItineraryComments(itineraryId),
+    enabled: !!itineraryId, // Only run the query if itineraryId is available
   });
 }
 

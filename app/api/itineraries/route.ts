@@ -41,7 +41,6 @@ export async function GET(request: Request) {
             }
           }
         },
-        comments: true,
       },
       orderBy: {
         position: "asc",

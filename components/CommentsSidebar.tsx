@@ -2,12 +2,11 @@ import React, { useState, useRef } from "react";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { useAddComment } from "../services/commentService"; // Import react-query hook
-import { User } from "../types";
-import { useSession } from "next-auth/react"; // For current user info
+import { useAddComment, useItineraryComments } from "../services/commentService"; // Import useItineraryComments
+import { useSession } from "next-auth/react";
 import { format } from "date-fns";
-import { useItinerary } from "@/services/itineraryService";
 import { uploadFile } from "@/services/s3Service";
+import { useItineraryChat } from '@/hooks/useItineraryChat'; // Import useItineraryChat
 
 interface CommentsSidebarProps {
   isOpen: boolean;
@@ -29,10 +28,12 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
   const addCommentMutation = useAddComment();
   const isPostingComment = addCommentMutation.isPending;
 
-  const { data: itinerary, isLoading } = useItinerary(itineraryId);
+  const { data: comments, isLoading } = useItineraryComments(itineraryId); // Use new hook
+  useItineraryChat(itineraryId); // Initialize socket for real-time updates
 
   if (isLoading) return null;
-  if (!itinerary) return null;
+
+  const currentComments = comments || [];
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,16 +63,6 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
     }
   };
 
-  const getUser = (userId: string | null | undefined): User => {
-    // If userId is null or undefined, return a default "Unknown" user
-    if (!userId) {
-      return { id: "unknown", name: "", image: "", email: null };
-    }
-    if (session?.user?.id === userId) return session.user as User; // Use session user if it's me
-    const collaborator = itinerary.collaborators.find((c => c.userId === userId));
-    return collaborator ? collaborator.user : { id: userId, name: "Unknown", image: "", email: null };
-  };
-
   const formatCommentTime = (isoString: string) => {
     return format(new Date(isoString), "p"); // e.g., 4:54 PM
   };
@@ -94,13 +85,12 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
-        {itinerary.comments.length === 0 && (
+        {currentComments.length === 0 && (
           <div className="h-full flex flex-col items-center justify-center text-slate-400 text-sm">
             <p>{t("startConversation")}</p>
           </div>
         )}
-        {itinerary.comments.map((comment) => {
-          const user = getUser(comment.authorId);
+        {currentComments.map((comment) => {
           const isMe = comment.authorId === session?.user?.id;
           return (
             <div
@@ -109,11 +99,11 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
             >
               <div
                 className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-200"
-                title={user.name ?? ""}
+                title={comment.author.name ?? ""}
               >
                 <img
-                  src={user.image ?? 'https://www.gravatar.com/avatar?d=mp'}
-                  alt={user.name ?? ""}
+                  src={comment.author.image ?? 'https://www.gravatar.com/avatar?d=mp'}
+                  alt={comment.author.name ?? ""}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -125,7 +115,7 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
                 >
                   {!isMe && (
                     <div className="text-xs font-bold mb-1 text-slate-500">
-                      {user.name}
+                      {comment.author.name}
                     </div>
                   )}
 
@@ -211,3 +201,4 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
     </motion.div>
   );
 };
+

@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     });
 
     // ========== call socket ==========
-    const socketUrl = process.env.SOCKET_SERVER_URL;
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
     if (socketUrl) {
       fetch(`${socketUrl}/broadcast`, {
         method: "POST",

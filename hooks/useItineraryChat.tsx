@@ -16,10 +16,8 @@ export function useItineraryChat(itineraryId: string | undefined) {
     socket.emit("join-room", itineraryId);
 
     // ===== 處理新訊息 =====
-    const handler = (msg: any) => {
-      queryClient.setQueryData(["comments", itineraryId], (old = []) => {
-        return [...old, msg];
-      });
+    const handler = () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", itineraryId] });
     };
 
     socket.on("new-message", handler);
