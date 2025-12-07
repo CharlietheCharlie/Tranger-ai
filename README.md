@@ -1,87 +1,127 @@
-# 🌍 Tranger AI
+Tranger — 即時多人協作旅遊規劃系統
 
-> **Collaborative, AI-Powered Travel Planning Application.**
+使用 Next.js、Prisma、PostgreSQL、Socket.IO 打造的全端協作旅遊規劃平台，支援多人共同編輯行程、即時聊天、圖片上傳與邀請分享。
 
-Tranger AI is a modern travel planner that combines the power of Generative AI with an intuitive drag-and-drop interface. Plan trips solo or collaborate in real-time with friends, visualize your itinerary, and get smart recommendations for your next adventure.
+功能總覽:
 
-![App Screenshot](https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80)
+Google 登入（NextAuth）
 
-## ✨ Key Features
+即時聊天室（Socket.IO）
 
-- **🤖 AI Trip Generation**: Powered by **Google Gemini 2.5**, simply enter a destination and duration to get a fully curated itinerary in seconds.
-- **🖱️ Drag & Drop Interface**: Effortlessly move activities between days or reorder your schedule using a smooth, physics-based dnd interaction.
-- **👥 Real-Time Collaboration**: Invite friends via email or link. See who is online and chat in real-time contextually within the trip.
-- **📱 PWA & Mobile Ready**: Installable on iOS and Android. Responsive design ensures you can plan on the go.
-- **🌍 Multi-Language Support**: Built-in support for English (EN), Traditional Chinese (繁體), and Japanese (JP).
-- **🗺️ Smart Location Search**: Integrated mock Google Places API for finding spots, checking ratings, and opening directions directly in Google Maps.
+行程拖曳編輯（dnd-kit）
 
-## 🛠️ Tech Stack
+邀請連結加入共同編輯
 
-This project leverages a cutting-edge **Next.js 15** architecture:
+聊天圖片上傳
 
-- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [Framer Motion](https://www.framer.com/motion/)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **Drag & Drop**: [@dnd-kit](https://dndkit.com/)
-- **AI Model**: [Google Gemini API (@google/genai)](https://ai.google.dev/)
-- **Testing**: [Vitest](https://vitest.dev/) (Unit) & [Playwright](https://playwright.dev/) (E2E)
-- **Database (Mocked/Ready)**: Prisma ORM schema ready for PostgreSQL.
+React Query 樂觀更新
 
-## 🚀 Getting Started
+多語系支援（英 / 繁 / 日）
 
-### Prerequisites
+全裝置 RWD 自適應
 
-- Node.js 18+ installed.
-- A Google Cloud Project with the **Gemini API** enabled (Get an API Key [here](https://aistudiocdn.com.google.com/)).
+PostgreSQL + Prisma
 
-### Installation
+Vercel + Railway 雲端部署
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-username/Tranger-ai.git
-   cd Tranger-ai
-   ```
+系統架構說明:
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+Next.js API：負責資料存取
 
-3. **Configure Environment**
-   Create a `.env.local` file in the root directory:
-   ```env
-   # Required for AI Features
-   API_KEY=your_google_gemini_api_key
-   
-   # Optional: Database URL if running with a real DB
-   # DATABASE_URL="postgresql://..."
-   ```
+Socket Server：負責廣播
 
-4. **Run the Development Server**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+狀態同步：使用 React Query
 
-## 🐳 Running with Docker
 
-You can spin up the entire environment including the E2E test runner using Docker Compose:
+聊天圖片上傳限制:
 
-```bash
-docker-compose up --build
-```
+只允許：JPG / PNG / GIF / WEBP
 
-- **App**: http://localhost:3000
-- **Playwright Report**: Generated in the `playwright-report` folder after tests run.
+最大 5MB
 
-## 📱 How to Use
+Tranger — Real-Time Collaborative Travel Planner
 
-1. **Create a Trip**: Click "New Trip". Enter "Tokyo", select dates, and toggle "Use AI Assistant".
-2. **Edit Itinerary**: Drag cards to reorder. Click a card to edit time, cost, or notes.
-3. **Invite Friends**: Click "Invite" in the header to copy a shareable link.
-4. **Chat**: Open the chat sidebar to leave notes or discuss plans with collaborators.
+A full-stack real-time collaborative travel planning application built with Next.js, Prisma, PostgreSQL, and Socket.IO.
+It allows users to create itineraries, manage daily activities with drag-and-drop, chat in real time, invite collaborators via secure links, and upload images to comments.
 
-## 📄 License
+This project focuses on:
 
-MIT License. Free to use for personal and commercial projects.
+Real-time collaboration
+
+Modern frontend architecture
+
+Scalable backend design
+
+Production-grade auth & file upload
+
+🚀 Live Features
+
+✅ Google OAuth Login (NextAuth)
+
+✅ Real-time chat via Socket.IO
+
+✅ Drag & drop itinerary editor (dnd-kit)
+
+✅ Invite collaborators via token links
+
+✅ Image upload for chat (S3-compatible)
+
+✅ Optimistic UI updates with React Query
+
+✅ i18n support (EN / ZH / JP)
+
+✅ Mobile-friendly responsive UI
+
+✅ PostgreSQL + Prisma ORM
+
+✅ Deployed with Vercel + Railway
+
+ Tech Stack
+Frontend
+
+Next.js (App Router)
+
+TypeScript
+
+Tailwind CSS
+
+Framer Motion
+
+React Query
+
+NextAuth
+
+dnd-kit
+
+next-intl (i18n)
+
+Backend
+
+Express (Socket Server)
+
+Socket.IO
+
+Prisma ORM
+
+PostgreSQL
+
+AWS S3 Compatible Storage
+
+Infrastructure
+
+Frontend: Vercel
+
+Backend (WebSocket): Railway
+
+Database: Railway PostgreSQL
+
+System Architecture
+[Next.js Client]
+   │
+   ├── REST API (Next.js Route Handlers)
+   │        │
+   │        └── Prisma → PostgreSQL
+   │
+   └── Socket.IO Client ────────┐
+                                │
+                         [Express Socket Server]
