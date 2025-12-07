@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, Check, Copy, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCreateInvite } from "@/services/commentService";
+import { useSession } from "next-auth/react";
 
 interface InviteModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
   onClose,
   itineraryId,
 }) => {
+  const { data: session } = useSession();
   const t = useTranslations("InviteModal");
   const [copied, setCopied] = useState(false);
   const [inviteUrl, setInviteUrl] = useState("");
@@ -21,7 +23,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
 
   // 當 Modal 打開 → call API 拿 inviteUrl
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && session?.user?.id) {
       createInvite.mutate(itineraryId, {
         onSuccess: (data) => {
           setInviteUrl(data.inviteUrl);
@@ -92,7 +94,13 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 {copied ? t("copied") : t("copy")}
               </button>
             </div>
+            {!session?.user && (
+            <div className="text-rose-600 text-sm py-2 px-3 bg-rose-50 rounded-md">
+              {t("loginToUseInvite")}
+            </div>
+          )}
           </div>
+         
         </div>
       </div>
     </div>

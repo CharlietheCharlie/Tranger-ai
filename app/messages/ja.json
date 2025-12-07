@@ -22,7 +22,8 @@
     "chat": "チャット",
     "startConversation": "会話を始めましょう。",
     "typeMessage": "メッセージを入力...",
-    "send": "送信"
+    "send": "送信",
+    "unknownUser": "不明なユーザー"
   },
   "ItineraryCard": {
     "days" : "{count, plural, =0 {0 日} one {1 日} other {# 日}}"
@@ -49,7 +50,8 @@
     "orLink": "またはリンクを共有",
     "tripLink": "旅行リンク",
     "copied": "コピー完了",
-    "copy": "コピー"
+    "copy": "コピー",
+    "loginToUseInvite": "招待機能を使用するにはサインインしてください。"
   },
   "EditActivityModal": {
     "editActivity": "アクティビティ編集",

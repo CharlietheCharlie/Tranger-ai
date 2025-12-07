@@ -2,57 +2,67 @@
 
 import { useSession } from 'next-auth/react';
 import { useStore } from '../services/store';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { User } from '../types';
-import { getTempUserId, clearTempUserId } from '../lib/client-utils'; // Import tempUserId utilities
+import { getTempUserId, clearTempUserId } from '../lib/client-utils';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function StoreInitializer() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { setCurrentUser } = useStore();
   const queryClient = useQueryClient();
 
+  const hasMergedRef = useRef(false);
+
   useEffect(() => {
-    // Ensure tempUserId exists for anonymous users
-    const currentTempUserId = getTempUserId(); 
+    if (status === 'unauthenticated') {
+      hasMergedRef.current = false;
+    }
+  }, [status]);
 
-    async function handleMerge() {
-      if (session?.user) {
-        const user: User = {
-          id: session.user.id!,
-          name: session.user.name,
-          email: session.user.email,
-          image: session.user.image,
-        };
-        setCurrentUser(user);
+  useEffect(() => {
+    if (!session?.user) return;
+    if (hasMergedRef.current) return;
 
-        // If a tempUserId existed before login, attempt to merge
-        if (currentTempUserId) {
-          try {
-            const response = await fetch('/api/user/merge', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ tempUserId: currentTempUserId }),
-            });
+    hasMergedRef.current = true;
 
-            if (!response.ok) {
-              console.error('Failed to merge anonymous data:', await response.json());
-            }
-            // Invalidate and refetch queries that might be affected by the merge
-            await queryClient.invalidateQueries({ queryKey: ['itineraries'] });
-          } catch (error) {
-            console.error('Error during anonymous data merge:', error);
-          } finally {
-            clearTempUserId(); // Always clear tempUserId after attempted merge, as it's no longer needed
-          }
+    const tempUserId = getTempUserId();
+
+    const user: User = {
+      id: session.user.id!,
+      name: session.user.name,
+      email: session.user.email,
+      image: session.user.image,
+    };
+
+    setCurrentUser(user);
+
+    if (!tempUserId) return;
+
+    async function merge() {
+      try {
+        const res = await fetch('/api/user/merge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tempUserId }),
+        });
+
+        if (!res.ok) {
+          console.error('Failed to merge anonymous data:', await res.json());
         }
-      } 
+
+        await queryClient.invalidateQueries({
+          queryKey: ['itineraries'],
+        });
+      } catch (err) {
+        console.error('Merge failed:', err);
+      } finally {
+        clearTempUserId();
+      }
     }
 
-    handleMerge();
-  }, [session, setCurrentUser]);
+    merge();
+  }, [session, status, setCurrentUser, queryClient]);
 
   return null;
 }

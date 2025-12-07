@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { uploadFile, validateUploadFile } from "@/services/s3Service";
 import { useItineraryChat } from "@/hooks/useItineraryChat"; // Import useItineraryChat
 import Image from "next/image";
+import { getTempUserId } from "@/lib/client-utils";
 
 interface CommentsSidebarProps {
   isOpen: boolean;
@@ -111,7 +112,7 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
           </div>
         )}
         {currentComments.map((comment) => {
-          const isMe = comment.authorId === session?.user?.id;
+          const isMe = comment.authorId === session?.user?.id || comment.tempAuthorId === getTempUserId();
           return (
             <div
               key={comment.id}
@@ -119,14 +120,14 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
             >
               <div
                 className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-200"
-                title={comment.author.name ?? ""}
+                title={comment.author?.name ?? t("unknownUser")}
               >
                 <img
                   src={
-                    comment.author.image ??
+                    comment.author?.image ??
                     "https://www.gravatar.com/avatar?d=mp"
                   }
-                  alt={comment.author.name ?? ""}
+                  alt={comment.author?.name ?? t("unknownUser")}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -138,7 +139,7 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
                 >
                   {!isMe && (
                     <div className="text-xs font-bold mb-1 text-slate-500">
-                      {comment.author.name}
+                      {comment.author?.name || t("unknownUser")}
                     </div>
                   )}
 

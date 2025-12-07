@@ -1,6 +1,17 @@
 
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Comment, User } from '../types';
+import { getTempUserId } from '@/lib/client-utils';
+
+function getHeaders() : HeadersInit {
+  const headers: HeadersInit = {};
+  const tempUserId = getTempUserId();
+  if (tempUserId) {
+    headers['x-temp-user-id'] = tempUserId;
+  }
+  headers['Content-Type'] = 'application/json';
+  return headers;
+}
 
 interface AddCommentData {
   itineraryId: string;
@@ -16,9 +27,7 @@ interface ItineraryComment extends Comment {
 async function addComment(commentData: AddCommentData) {
   const response = await fetch('/api/comments', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getHeaders(),
     body: JSON.stringify(commentData),
   });
 
@@ -36,7 +45,9 @@ export function useAddComment() {
 }
 
 async function getItineraryComments(itineraryId: string): Promise<ItineraryComment[]> {
-  const response = await fetch(`/api/itineraries/${itineraryId}/comments`);
+  const response = await fetch(`/api/itineraries/${itineraryId}/comments`,{
+    headers: getHeaders(),
+  });
   if (!response.ok) {
     throw new Error('Failed to fetch itinerary comments');
   }
