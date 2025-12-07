@@ -116,14 +116,3 @@ Frontend: Vercel
 Backend (WebSocket): Railway
 
 Database: Railway PostgreSQL
-
-System Architecture
-[Next.js Client]
-   │
-   ├── REST API (Next.js Route Handlers)
-   │        │
-   │        └── Prisma → PostgreSQL
-   │
-   └── Socket.IO Client ────────┐
-                                │
-                         [Express Socket Server]
