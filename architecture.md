@@ -1,5 +1,5 @@
 
-# Tranger AI - Hybrid Vercel & AWS Architecture
+# Tranger - Hybrid Vercel & AWS Architecture
 
 This architecture is optimized for a "Side Project" budget while maintaining scalability. It leverages Vercel for the frontend/SSR and AWS for stateful serverless compute.
 

@@ -5,7 +5,7 @@ import '../globals.css';
 import Providers from '../providers';
 
 export const metadata = {
-  title: 'Tranger AI',
+  title: 'Tranger',
   description: 'Collaborative AI Travel Planner',
   manifest: '/manifest.json',
 };

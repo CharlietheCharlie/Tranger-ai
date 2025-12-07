@@ -1,6 +1,6 @@
 # 👨‍💻 Developer Guide
 
-This document provides a technical overview of the Tranger AI architecture, intended for developers contributing to the project or deploying it to production.
+This document provides a technical overview of the Tranger architecture, intended for developers contributing to the project or deploying it to production.
 
 ## 🏗️ Architecture Overview
 
