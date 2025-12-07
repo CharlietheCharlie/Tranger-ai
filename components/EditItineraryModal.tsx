@@ -13,7 +13,7 @@ import {
   useUpdateItinerary,
   useDeleteItinerary,
 } from "../services/itineraryService";
-import { deleteFile, uploadFile } from "@/services/s3Service";
+import { deleteFile, uploadFile, validateUploadFile } from "@/services/s3Service";
 import { useStore } from "@/services/store";
 
 interface EditItineraryModalProps {
@@ -113,6 +113,11 @@ export const EditItineraryModal: React.FC<EditItineraryModalProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const isValid = validateUploadFile(file);
+    if (!isValid.valid) {
+      alert(isValid.error || "Invalid file");
+      return;
+    }
     const fileUrl = await uploadFile(file);
 
     setFormData({

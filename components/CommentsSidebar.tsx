@@ -2,11 +2,15 @@ import React, { useState, useRef, useEffect } from "react";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { useAddComment, useItineraryComments } from "../services/commentService"; // Import useItineraryComments
+import {
+  useAddComment,
+  useItineraryComments,
+} from "../services/commentService"; // Import useItineraryComments
 import { useSession } from "next-auth/react";
 import { format } from "date-fns";
-import { uploadFile } from "@/services/s3Service";
-import { useItineraryChat } from '@/hooks/useItineraryChat'; // Import useItineraryChat
+import { uploadFile, validateUploadFile } from "@/services/s3Service";
+import { useItineraryChat } from "@/hooks/useItineraryChat"; // Import useItineraryChat
+import Image from "next/image";
 
 interface CommentsSidebarProps {
   isOpen: boolean;
@@ -23,6 +27,7 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
   const t = useTranslations("CommentsSidebar");
   const [newCommentText, setNewCommentText] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addCommentMutation = useAddComment();
@@ -46,12 +51,17 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
     setImagePreview(null);
+    setUploadError(null);
+    const isValid = validateUploadFile(file);
+    if (!isValid.valid) {
+      setUploadError(isValid.error || "Invalid file");
+      return;
+    }
 
     const fileUrl = await uploadFile(file);
-  
+
     setImagePreview(fileUrl);
   };
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,8 +84,6 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
     return format(new Date(isoString), "p"); // e.g., 4:54 PM
   };
 
-
-
   return (
     <motion.div
       initial={{ x: "100%" }}
@@ -93,7 +101,10 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
         </button>
       </div>
 
-      <div id="chat-container" className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
+      <div
+        id="chat-container"
+        className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50"
+      >
         {currentComments.length === 0 && (
           <div className="h-full flex flex-col items-center justify-center text-slate-400 text-sm">
             <p>{t("startConversation")}</p>
@@ -111,7 +122,10 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
                 title={comment.author.name ?? ""}
               >
                 <img
-                  src={comment.author.image ?? 'https://www.gravatar.com/avatar?d=mp'}
+                  src={
+                    comment.author.image ??
+                    "https://www.gravatar.com/avatar?d=mp"
+                  }
                   alt={comment.author.name ?? ""}
                   className="w-full h-full object-cover"
                 />
@@ -155,7 +169,8 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
         {imagePreview && (
           <div className="relative inline-block ml-2">
             <div className="w-16 h-16 rounded-md overflow-hidden border border-slate-200">
-              <img
+              <Image
+                fill
                 src={imagePreview}
                 className="w-full h-full object-cover"
                 alt="preview"
@@ -206,8 +221,12 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
             </button>
           </div>
         </form>
+        {uploadError && (
+          <div className="text-xs text-rose-600 font-medium px-2">
+            {uploadError}
+          </div>
+        )}
       </div>
     </motion.div>
   );
 };
-
