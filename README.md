@@ -1,10 +1,12 @@
-Tranger — 即時多人協作旅遊規劃系統
+Tranger — 支援AI生成行程的即時多人協作旅遊規劃系統
 
-使用 Next.js、Prisma、PostgreSQL、Socket.IO 打造的全端協作旅遊規劃平台，支援多人共同編輯行程、即時聊天、圖片上傳與邀請分享。
+使用 Next.js、ChatGPT、Prisma、PostgreSQL、Socket.IO 打造的全端協作旅遊規劃平台，支援多人共同編輯行程、即時聊天、圖片上傳與邀請分享。
 
 功能總覽:
 
 Google 登入（NextAuth）
+
+AI 生成行程
 
 即時聊天室（Socket.IO）
 
@@ -41,7 +43,7 @@ Socket Server：負責廣播
 
 Tranger — Real-Time Collaborative Travel Planner
 
-A full-stack real-time collaborative travel planning application built with Next.js, Prisma, PostgreSQL, and Socket.IO.
+A full-stack real-time collaborative travel planning application with AI-generated trip planning, drag-and-drop itinerary management, real-time chat, image upload, and secure invite links. built with Next.js, Prisma, PostgreSQL, and Socket.IO.
 It allows users to create itineraries, manage daily activities with drag-and-drop, chat in real time, invite collaborators via secure links, and upload images to comments.
 
 This project focuses on:
@@ -56,25 +58,25 @@ Production-grade auth & file upload
 
 🚀 Live Features
 
-✅ Google OAuth Login (NextAuth)
+✅ AI-generated trip planning
 
-✅ Real-time chat via Socket.IO
+✅ Manual drag & drop itinerary editing
 
-✅ Drag & drop itinerary editor (dnd-kit)
+✅ Real-time chat with image upload
 
 ✅ Invite collaborators via token links
 
-✅ Image upload for chat (S3-compatible)
+✅ Google OAuth login
 
-✅ Optimistic UI updates with React Query
+✅ Optimistic UI updates
 
-✅ i18n support (EN / ZH / JP)
+✅ Multi-language support
 
-✅ Mobile-friendly responsive UI
+✅ Mobile-first responsive UI
 
 ✅ PostgreSQL + Prisma ORM
 
-✅ Deployed with Vercel + Railway
+✅ Vercel + Railway deployment
 
  Tech Stack
 Frontend
