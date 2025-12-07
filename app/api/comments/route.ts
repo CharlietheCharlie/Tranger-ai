@@ -26,6 +26,13 @@ export async function POST(request: Request) {
       },
     });
 
+    const fullComment = await prisma.comment.findUnique({
+      where: { id: newComment.id },
+      include: {
+        author: true,
+      },
+    });
+
     // ========== call socket ==========
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
     if (socketUrl) {
@@ -35,7 +42,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           type: "new-message",
           itineraryId,
-          payload: newComment,
+          payload: fullComment,
         }),
       }).catch((err) => console.error("Socket broadcast error:", err));
     }

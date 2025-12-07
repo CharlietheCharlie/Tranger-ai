@@ -6,7 +6,6 @@ import { getSocket } from "@/lib/socket";
 
 export function useItineraryChat(itineraryId: string | undefined) {
   const queryClient = useQueryClient();
-
   useEffect(() => {
     if (!itineraryId) return;
 
@@ -16,8 +15,18 @@ export function useItineraryChat(itineraryId: string | undefined) {
     socket.emit("join-room", itineraryId);
 
     // ===== 處理新訊息 =====
-    const handler = () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", itineraryId] });
+    const handler = (newMessage: any) => {
+      console.log("Received new message via socket:", newMessage);
+      queryClient.setQueryData(
+        ["comments", itineraryId],
+        (old: any[] | undefined) => {
+          if (!old) return [newMessage];
+
+          if (old.some((m) => m.id === newMessage.id)) return old;
+
+          return [...old, newMessage];
+        }
+      );
     };
 
     socket.on("new-message", handler);

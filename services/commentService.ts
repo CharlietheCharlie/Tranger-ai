@@ -31,11 +31,7 @@ async function addComment(commentData: AddCommentData) {
 export function useAddComment() {
   const queryClient = useQueryClient();
   return useMutation<Comment, Error, AddCommentData>({
-    mutationFn: addComment,
-    onSuccess: (_data, vars) => {
-      // Invalidate the specific comments query for the itinerary
-      queryClient.invalidateQueries({ queryKey: ['comments', vars.itineraryId] });
-    },
+    mutationFn: addComment
   });
 }
 

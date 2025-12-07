@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -30,6 +30,13 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
 
   const { data: comments, isLoading } = useItineraryComments(itineraryId); // Use new hook
   useItineraryChat(itineraryId); // Initialize socket for real-time updates
+
+  useEffect(() => {
+    if (comments && comments.length > 0) {
+      const chatContainer = document.getElementById("chat-container");
+      chatContainer?.scrollTo(0, chatContainer.scrollHeight);
+    }
+  }, [comments]);
 
   if (isLoading) return null;
 
@@ -67,6 +74,8 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
     return format(new Date(isoString), "p"); // e.g., 4:54 PM
   };
 
+
+
   return (
     <motion.div
       initial={{ x: "100%" }}
@@ -84,7 +93,7 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
+      <div id="chat-container" className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
         {currentComments.length === 0 && (
           <div className="h-full flex flex-col items-center justify-center text-slate-400 text-sm">
             <p>{t("startConversation")}</p>
