@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Itinerary } from "../types";
 import { getTempUserId } from "../lib/client-utils"; // Import getTempUserId
 
-async function fetchItineraries(): Promise<Itinerary[]> {
+export async function fetchItineraries(): Promise<Itinerary[]> {
   const headers: HeadersInit = {};
   const tempUserId = getTempUserId();
   if (tempUserId) {
@@ -23,7 +23,7 @@ export function useItineraries() {
   });
 }
 
-async function fetchItineraryById(id: string): Promise<Itinerary> {
+export async function fetchItineraryById(id: string): Promise<Itinerary> {
   const headers: HeadersInit = {};
   const tempUserId = getTempUserId();
   if (tempUserId) {
@@ -45,7 +45,7 @@ export function useItinerary(itineraryId: string) {
   });
 }
 
-async function createItinerary(newItineraryData: Omit<Itinerary, "id">) {
+export async function createItinerary(newItineraryData: Omit<Itinerary, "id">) {
   const headers: HeadersInit = { "Content-Type": "application/json" };
   const tempUserId = getTempUserId();
   if (tempUserId) {
@@ -74,7 +74,7 @@ export function useCreateItinerary() {
   });
 }
 
-async function updateItinerary({
+export async function updateItinerary({
   id,
   updates,
 }: {
@@ -116,7 +116,7 @@ export function useUpdateItinerary() {
   });
 }
 
-async function deleteItinerary(id: string) {
+export async function deleteItinerary(id: string) {
   const headers: HeadersInit = {};
   const tempUserId = getTempUserId();
   if (tempUserId) {
@@ -143,7 +143,7 @@ export function useDeleteItinerary() {
   });
 }
 
-async function reorderItineraries(orderedItineraryIds: string[]) {
+export async function reorderItineraries(orderedItineraryIds: string[]) {
   const headers: HeadersInit = { "Content-Type": "application/json" };
   const tempUserId = getTempUserId();
   if (tempUserId) {

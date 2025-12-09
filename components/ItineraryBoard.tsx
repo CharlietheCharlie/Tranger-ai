@@ -164,7 +164,7 @@ export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, isFet
   return (
     <div className="relative h-full">
       {isUpdating && (
-        <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-50" data-testid="loader">
           <Loader2 size={48} className="text-slate-900 animate-spin" />
         </div>
       )}

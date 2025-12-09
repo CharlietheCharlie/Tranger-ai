@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Activity, Day } from '../types';
 import { getTempUserId } from '@/lib/client-utils';
-import { g } from 'vitest/dist/suite-dWqIFb_-.js';
+
 
 interface AddActivityData {
   itineraryId: string;
@@ -19,7 +19,7 @@ function getHeaders() {
   return headers;
 }
 
-async function addActivity({ itineraryId, dayId, activity }: AddActivityData) {
+export async function addActivity({ itineraryId, dayId, activity }: AddActivityData) {
   const response = await fetch(`/api/itineraries/${itineraryId}/days/${dayId}/activities`, {
     method: 'POST',
     headers: getHeaders(),
@@ -48,7 +48,7 @@ interface UpdateActivityData {
   updates: Partial<Activity>;
 }
 
-async function updateActivity({ activityId, updates }: UpdateActivityData) {
+export async function updateActivity({ activityId, updates }: UpdateActivityData) {
   
   const response = await fetch(`/api/activities/${activityId}`, {
     method: 'PATCH',
@@ -81,7 +81,7 @@ interface MoveActivityData {
   position: number;
 }
 
-async function moveActivity({ activityId, targetDayId, position }: MoveActivityData) {
+export async function moveActivity({ activityId, targetDayId, position }: MoveActivityData) {
   const response = await fetch(`/api/activities/${activityId}/move`, {
     method: 'POST',
     headers: getHeaders(),
@@ -106,7 +106,7 @@ export function useMoveActivity() {
   });
 }
 
-async function deleteActivity({ activityId }: { activityId: string }) {
+export async function deleteActivity({ activityId }: { activityId: string }) {
   const response = await fetch(`/api/activities/${activityId}`, {
     method: 'DELETE',
   });
@@ -133,7 +133,7 @@ interface ReorderDaysData {
   orderedDayIds: string[];
 }
 
-async function reorderDays({ itineraryId, orderedDayIds }: ReorderDaysData) {
+export async function reorderDays({ itineraryId, orderedDayIds }: ReorderDaysData) {
   const response = await fetch(`/api/itineraries/${itineraryId}/days`, {
     method: 'PATCH',
     headers: getHeaders(),
@@ -163,7 +163,7 @@ interface ReorderActivitiesData {
   orderedActivityIds: string[];
 }
 
-async function reorderActivities({ itineraryId, dayId, orderedActivityIds }: ReorderActivitiesData) {
+export async function reorderActivities({ itineraryId, dayId, orderedActivityIds }: ReorderActivitiesData) {
   const response = await fetch(`/api/itineraries/${itineraryId}/days/${dayId}/activities/reorder`, {
     method: 'PATCH',
     headers: getHeaders(),
