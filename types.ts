@@ -9,12 +9,14 @@ export interface Activity {
   cost?: number;
   tags?: string[];
   notes?: string;
+  position?: number; // For ordering within a day
 }
 
 export interface Day {
   id: string;
   date: string; // ISO date string
   activities: Activity[];
+  position?: number;
 }
 
 export interface Comment {
@@ -41,6 +43,7 @@ export interface Itinerary {
   days: Day[];
   collaborators: Collaborator[];
   comments: Comment[]; // Trip-level comments
+  position?: number;
 }
 
 export interface User {

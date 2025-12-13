@@ -23,7 +23,7 @@ vi.mock('@/lib/client-utils', () => ({
 const mockActivity: Activity = {
   id: 'act1',
   title: 'Test Activity',
-  time: '10:00',
+  startTime: '10:00',
   description: 'A test activity',
   cost: 0,
   tags: [],
