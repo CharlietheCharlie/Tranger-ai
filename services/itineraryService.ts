@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Itinerary } from "../types";
-import { getTempUserId } from "../lib/client-utils"; // Import getTempUserId
+import { getTempUserId } from "../lib/client-utils";
 
 export async function fetchItineraries(): Promise<Itinerary[]> {
   const headers: HeadersInit = {};
@@ -41,7 +41,7 @@ export function useItinerary(itineraryId: string) {
   return useQuery<Itinerary, Error>({
     queryKey: ["itinerary", itineraryId],
     queryFn: () => fetchItineraryById(itineraryId),
-    enabled: !!itineraryId, // Only run the query if itineraryId is truthy
+    enabled: !!itineraryId,
   });
 }
 

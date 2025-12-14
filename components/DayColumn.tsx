@@ -10,7 +10,7 @@ import { Day, Activity } from "../types";
 import { ActivityCard } from "./ActivityCard";
 import { Plus, GripVertical, CalendarDays } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
-import { useDeleteActivity } from "../services/activityService"; // Import react-query hook
+import { useDeleteActivity } from "../services/activityService";
 import { format, Locale } from "date-fns";
 import { enUS, zhTW, ja } from "date-fns/locale";
 
@@ -33,7 +33,7 @@ export const DayColumn: React.FC<DayColumnProps> = ({
   onActivityClick,
   onAddActivity,
 }) => {
-  const deleteActivityMutation = useDeleteActivity(); // Use the mutation hook
+  const deleteActivityMutation = useDeleteActivity();
   const t = useTranslations("DayColumn");
   const locale = useLocale();
 
@@ -61,7 +61,6 @@ export const DayColumn: React.FC<DayColumnProps> = ({
   const dateObj = new Date(day.date);
   const dateFnsLocale = localeMap[locale] || enUS;
 
-  // Format based on locale preference
   const formattedDate = format(dateObj, "MMM d", { locale: dateFnsLocale });
   const weekday = format(dateObj, "EEEE", { locale: dateFnsLocale });
   const fullDate = format(dateObj, "PPPP", { locale: dateFnsLocale });

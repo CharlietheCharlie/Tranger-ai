@@ -21,7 +21,7 @@ export async function POST() {
     ContentType: "image/jpeg",
   });
 
-  const url = await getSignedUrl(s3, command, { expiresIn: 300 }); // 5 分鐘
+  const url = await getSignedUrl(s3, command, { expiresIn: 300 }); // 5 minutes
 
   return Response.json({
     uploadUrl: url,

@@ -19,7 +19,7 @@ import {
 import { ItineraryCard } from './ItineraryCard';
 import { Plus, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useItineraries, useReorderItineraries } from '../services/itineraryService'; // Import the new hooks
+import { useItineraries, useReorderItineraries } from '../services/itineraryService';
 import DashboardSkeleton from './DashboardSkeleton';
 
 interface DashboardProps {
@@ -28,8 +28,8 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onSelectItinerary, onNewTrip }) => {
-  const { data: itineraries, isLoading, isError } = useItineraries(); // Use the new hook for itineraries
-  const reorderItinerariesMutation = useReorderItineraries(); // Use the reorder mutation hook
+  const { data: itineraries, isLoading, isError } = useItineraries();
+  const reorderItinerariesMutation = useReorderItineraries();
   const t = useTranslations("Dashboard");
   const [searchTerm, setSearchTerm] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);

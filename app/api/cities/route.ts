@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     );
   }
 
-  // 搜尋要吃所有語言
+  // Search across all languages
   const where = {
     OR: [
       {
@@ -54,13 +54,13 @@ export async function GET(request: Request) {
 
       
   const result = cities.map((c) => {
-    // 顯示名字依 lang 選擇
+    // Display name based on lang
     const localizedName =
       lang === "en"
         ? c.nameEn
         : c.altNames[0]?.name ?? c.nameEn; // fallback
 
-    // 國家名稱依 lang
+    // Country name based on lang
     let countryName = c.countryNameEn;
     if (lang === "zh-TW") countryName = c.countryNameZhTW ?? countryName;
     if (lang === "ja") countryName = c.countryNameJa ?? countryName;

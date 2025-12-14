@@ -4,10 +4,10 @@ import { useTranslations, useLocale } from "next-intl";
 import {
   useCreateItinerary,
   useUpdateItinerary,
-} from "../services/itineraryService"; // Import react-query hooks
+} from "../services/itineraryService";
 import { Itinerary, Day } from "../types";
-import { useSession } from "next-auth/react"; // Import useSession
-import { getTempUserId } from "../lib/client-utils"; // Import getTempUserId
+import { useSession } from "next-auth/react";
+import { getTempUserId } from "../lib/client-utils";
 import { CityAutocomplete } from "./CityAutoComplete";
 import { AnimatedLoadingText } from "./AnimatedLoadingText";
 
@@ -24,7 +24,7 @@ export const TripGeneratorModal: React.FC<TripGeneratorModalProps> = ({
 }) => {
   const t = useTranslations("TripGeneratorModal");
   const locale = useLocale();
-  const { data: session } = useSession(); // Get session
+  const { data: session } = useSession();
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>(
     []
   );
@@ -68,7 +68,6 @@ export const TripGeneratorModal: React.FC<TripGeneratorModalProps> = ({
     try {
       const destString = selectedDestinations.join(", ");
 
-      // Construct days data for initial itinerary creation
       const daysData: Day[] = [];
       for (let i = 0; i < daysCount; i++) {
         const date = new Date(startDate);
@@ -80,7 +79,6 @@ export const TripGeneratorModal: React.FC<TripGeneratorModalProps> = ({
         });
       }
 
-      // Prepare headers with tempUserId if anonymous
       const headers: HeadersInit = { "Content-Type": "application/json" };
       if (!session?.user) {
         headers["x-temp-user-id"] = getTempUserId();
@@ -94,7 +92,6 @@ export const TripGeneratorModal: React.FC<TripGeneratorModalProps> = ({
         days: daysData,
         collaborators: [],
         comments: [],
-        // creatorId and tempCreatorId will be set in the API based on session or x-temp-user-id header
       };
 
       let generatedData: Partial<Itinerary> = {};
@@ -116,7 +113,7 @@ export const TripGeneratorModal: React.FC<TripGeneratorModalProps> = ({
 
       const createdItinerary: Itinerary =
         await createItineraryMutation.mutateAsync(newItineraryData);
-      // If AI generated data exists, update the itinerary
+      
       if (useAI && generatedData) {
         await updateItineraryMutation.mutateAsync({
           id: createdItinerary.id,

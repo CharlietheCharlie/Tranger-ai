@@ -79,7 +79,7 @@ export async function PATCH(
         coverImage,
         ...(days && {
           days: {
-            deleteMany: { itineraryId }, // 清掉舊的 days
+            deleteMany: { itineraryId }, // Clear old days
             create: days.map((day: any) => ({
               date: new Date(day.date),
               position: day.position ?? 0,

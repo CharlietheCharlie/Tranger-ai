@@ -58,7 +58,7 @@
     "addActivity": "新增活動",
     "title": "標題",
     "time": "時間",
-    "duration": "天數",
+    "duration": "時長",
     "timeConflict": "檢測到與其他活動時間衝突。",
     "location": "地點",
     "notes": "備註",

@@ -29,7 +29,7 @@ export function useItineraryChat(itineraryId: string | undefined) {
       console.error("Socket connection error:", err);
     });
 
-    // ===== 處理新訊息 =====
+    // Handle new message
     const handler = (newMessage: any) => {
       console.log("Received new message via socket:", newMessage);
       queryClient.setQueryData(
@@ -46,7 +46,7 @@ export function useItineraryChat(itineraryId: string | undefined) {
 
     socket.on("new-message", handler);
 
-    // ===== 離開房間 + 清除事件 =====
+    // Leave room and cleanup
     return () => {
       socket.emit("leave-room", itineraryId);
       socket.off("connect", handleJoinRoom);

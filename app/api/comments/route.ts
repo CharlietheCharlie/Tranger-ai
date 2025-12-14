@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       },
     });
 
-    // ========== call socket ==========
+    // Broadcast via socket
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
     if (socketUrl) {
       fetch(`${socketUrl}/broadcast`, {

@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       },
     });
 
-    // 2. 同時把登入的 user 加入 collaborators
+    // 2. Add logged-in user as collaborator
     const itinerariesToJoin = await prisma.itinerary.findMany({
       where: { creatorId: realUserId },
     });
