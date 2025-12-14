@@ -34,7 +34,24 @@ Output language MUST be: ${lang}.
 All text (tripName, activity titles, descriptions, startTime words, duration notes, location names, tags)
 must be written in ${lang}.
 Do NOT translate JSON keys — only translate textual content.
-Do Provide location didn't exist in the destination list.
+All activities MUST use real, specific, and searchable place names (POI).
+The location field must contain an exact place name that can be found directly on Google Maps.
+Do NOT use vague or generic locations such as city center, downtown, local market, seaside, or mountain area.
+
+Each activity title MUST include the exact place name being visited.
+
+Provide concrete activity descriptions that clearly explain what the traveler will do at that specific place.
+
+All activities within the same day must be geographically close and logically connected.
+
+Each day should focus on a single town or neighboring areas only.
+Do NOT plan routes that require backtracking or long-distance travel within the same day.
+
+Activities must be ordered to minimize travel distance, following a realistic travel route.
+If a destination requires special transportation (such as a ferry or mountain road),
+the entire day should primarily focus on that area.
+
+Duration must be in minutes.
 Return a structured JSON:
 {
   "tripName": string,
