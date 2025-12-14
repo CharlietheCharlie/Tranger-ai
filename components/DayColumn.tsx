@@ -65,6 +65,10 @@ export const DayColumn: React.FC<DayColumnProps> = ({
   const weekday = format(dateObj, "EEEE", { locale: dateFnsLocale });
   const fullDate = format(dateObj, "PPPP", { locale: dateFnsLocale });
 
+  const sortedActivities = React.useMemo(() => {
+    return [...day.activities].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  }, [day.activities]);
+
   return (
     <div
       ref={setSortableRef}
@@ -107,7 +111,7 @@ export const DayColumn: React.FC<DayColumnProps> = ({
       <div className="flex-1 p-4 overflow-y-auto min-h-[150px] bg-slate-50/50">
         <SortableContext
           id={day.id}
-          items={day.activities.map((a) => a.id)}
+          items={sortedActivities.map((a) => a.id)}
           strategy={verticalListSortingStrategy}
         >
           <div className="flex flex-col gap-3 pb-10">
@@ -118,7 +122,7 @@ export const DayColumn: React.FC<DayColumnProps> = ({
                 </span>
               </div>
             )}
-            {day.activities.map((activity) => (
+            {sortedActivities.map((activity) => (
               <ActivityCard
                 key={activity.id}
                 activity={activity}

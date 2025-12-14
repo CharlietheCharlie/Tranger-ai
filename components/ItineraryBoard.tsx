@@ -67,6 +67,10 @@ export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, isFet
 
   const isUpdating = isFetching || reorderDaysMutation.isPending || moveActivityMutation.isPending || reorderActivitiesMutation.isPending;
 
+  const sortedDays = React.useMemo(() => {
+    return [...itinerary.days].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  }, [itinerary.days]);
+
   const handleAddActivity = (dayId: string) => {
     onActivityClick?.(null, dayId);
   };
@@ -109,11 +113,11 @@ export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, isFet
     }
 
     if (activeType === 'DAY') {
-        const oldIndex = itinerary.days.findIndex(d => d.id === active.id);
-        const newIndex = itinerary.days.findIndex(d => d.id === over.id);
+        const oldIndex = sortedDays.findIndex(d => d.id === active.id);
+        const newIndex = sortedDays.findIndex(d => d.id === over.id);
         
         if (oldIndex !== newIndex) {
-            const orderedDayIds = arrayMove(itinerary.days, oldIndex, newIndex).map(d => d.id);
+            const orderedDayIds = arrayMove(sortedDays, oldIndex, newIndex).map(d => d.id);
             await reorderDaysMutation.mutateAsync({ itineraryId: itinerary.id, orderedDayIds });
         }
     }
@@ -123,17 +127,21 @@ export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, isFet
         const overDay = itinerary.days.find(d => d.id === over.id || d.activities.some(a => a.id === over.id));
 
         if (sourceDay && overDay) {
-            const sourceActivityIndex = sourceDay.activities.findIndex(a => a.id === active.id);
-            const sourceActivity = sourceDay.activities[sourceActivityIndex];
+            const sourceActivities = [...sourceDay.activities].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+            const overActivities = sourceDay.id === overDay.id
+                ? sourceActivities
+                : [...overDay.activities].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
+            const sourceActivityIndex = sourceActivities.findIndex(a => a.id === active.id);
             
-            let overActivityIndex = overDay.activities.findIndex(a => a.id === over.id);
+            let overActivityIndex = overActivities.findIndex(a => a.id === over.id);
             if (over.data.current?.type === 'DAY') {
-                overActivityIndex = overDay.activities.length;
+                overActivityIndex = overActivities.length;
             }
 
             if (sourceDay.id === overDay.id) {
                 // Reordering within the same day
-                const reorderedActivities = arrayMove(sourceDay.activities, sourceActivityIndex, overActivityIndex);
+                const reorderedActivities = arrayMove(sourceActivities, sourceActivityIndex, overActivityIndex);
                 const orderedActivityIds = reorderedActivities.map(a => a.id);
                 await reorderActivitiesMutation.mutateAsync({
                     itineraryId: itinerary.id,
@@ -144,7 +152,7 @@ export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, isFet
                 // Moving to a different day
                 await moveActivityMutation.mutateAsync({
                     itineraryId: itinerary.id,
-                    activityId: sourceActivity.id,
+                    activityId: active.id as string,
                     targetDayId: overDay.id,
                     position: overActivityIndex,
                 });
@@ -176,8 +184,8 @@ export const ItineraryBoard: React.FC<ItineraryBoardProps> = ({ itinerary, isFet
         onDragEnd={handleDragEnd}
       >
         <div className="flex h-full gap-4 md:gap-6 p-4 md:p-6 overflow-x-auto bg-white/50 no-scrollbar snap-x snap-mandatory">
-          <SortableContext items={itinerary.days.map(d => d.id)} strategy={horizontalListSortingStrategy}>
-              {itinerary.days.map((day) => (
+          <SortableContext items={sortedDays.map(d => d.id)} strategy={horizontalListSortingStrategy}>
+              {sortedDays.map((day) => (
               <DayColumn 
                   key={day.id} 
                   day={day} 
