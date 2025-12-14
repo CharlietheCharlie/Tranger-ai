@@ -9,7 +9,6 @@ import {
 import { useSession } from "next-auth/react";
 import { format } from "date-fns";
 import { uploadFile, validateUploadFile } from "@/services/s3Service";
-import { useItineraryChat } from "@/hooks/useItineraryChat"; // Import useItineraryChat
 import Image from "next/image";
 import { getTempUserId } from "@/lib/client-utils";
 
@@ -35,7 +34,6 @@ export const CommentsSidebar: React.FC<CommentsSidebarProps> = ({
   const isPostingComment = addCommentMutation.isPending;
 
   const { data: comments, isLoading } = useItineraryComments(itineraryId); // Use new hook
-  useItineraryChat(itineraryId); // Initialize socket for real-time updates
 
   useEffect(() => {
     if (comments && comments.length > 0) {

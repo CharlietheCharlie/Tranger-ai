@@ -11,8 +11,23 @@ export function useItineraryChat(itineraryId: string | undefined) {
 
     const socket = getSocket();
 
-    // ===== 加入房間 =====
-    socket.emit("join-room", itineraryId);
+    const handleJoinRoom = () => {
+      console.log("Joining room:", itineraryId);
+      socket.emit("join-room", itineraryId);
+    };
+
+    // Join immediately if connected
+    if (socket.connected) {
+      handleJoinRoom();
+    }
+
+    // Re-join on reconnect
+    socket.on("connect", handleJoinRoom);
+
+    // Debug connection errors
+    socket.on("connect_error", (err: any) => {
+      console.error("Socket connection error:", err);
+    });
 
     // ===== 處理新訊息 =====
     const handler = (newMessage: any) => {
@@ -34,7 +49,9 @@ export function useItineraryChat(itineraryId: string | undefined) {
     // ===== 離開房間 + 清除事件 =====
     return () => {
       socket.emit("leave-room", itineraryId);
+      socket.off("connect", handleJoinRoom);
       socket.off("new-message", handler);
+      socket.off("connect_error");
     };
   }, [itineraryId, queryClient]);
 }

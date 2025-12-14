@@ -40,7 +40,10 @@ async function addComment(commentData: AddCommentData) {
 export function useAddComment() {
   const queryClient = useQueryClient();
   return useMutation<Comment, Error, AddCommentData>({
-    mutationFn: addComment
+    mutationFn: addComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
+    },
   });
 }
 

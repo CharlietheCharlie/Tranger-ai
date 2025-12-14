@@ -16,6 +16,7 @@ import { useItinerary } from "./services/itineraryService";
 import ItinerarySkeleton from "./components/ItinerarySkeleton";
 import { useRouter } from "next/navigation";
 import { Navbar } from "./components/Navbar";
+import { useItineraryChat } from "./hooks/useItineraryChat";
 
 const App = () => {
   const { currentItineraryId, selectItinerary } = useStore();
@@ -30,6 +31,8 @@ const App = () => {
     activity?: Activity | null;
     dayId: string;
   } | null>(null);
+
+  useItineraryChat(currentItineraryId);
 
   const {
     data: currentItinerary,
