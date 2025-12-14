@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const city = (searchParams.get("city") || "").toLowerCase();
+  const city = searchParams.get("city") || "";
   const lang = searchParams.get("lang") || "en";
 
   if (!city) {
@@ -18,7 +19,8 @@ export async function GET(request: Request) {
     OR: [
       {
         nameEn: {
-          startsWith: city ,
+          startsWith: city,
+          mode: Prisma.QueryMode.insensitive,
         },
       },
       {
@@ -26,6 +28,7 @@ export async function GET(request: Request) {
           some: {
             name: {
               startsWith: city,
+              mode: Prisma.QueryMode.insensitive,
             },
           },
         },
